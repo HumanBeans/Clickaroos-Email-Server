@@ -1,0 +1,33 @@
+{
+  "name": "Clickaroos-Email-Server",
+  "version": "0.0.0",
+  "description": "> Pithy project description",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HumanBeans/Clickaroos-Email-Server.git"
+  },
+  "author": "Armando Perez, Joe, Dara, Mai Ly, Haiming Bao",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HumanBeans/Clickaroos-Email-Server/issues"
+  },
+  "homepage": "https://github.com/HumanBeans/Clickaroos-Email-Server",
+  "dependencies": {
+    "body-parser": "^1.8.3",
+    "express": "^4.9.4",
+    "morgan": "^1.3.1",
+    "mysql": "^2.5.0",
+    "q": "^1.0.1"
+  },
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "gulp": "^3.8.8",
+    "gulp-mocha": "^1.1.0",
+    "karma": "^0.12.23",
+    "mocha": "^1.21.4"
+  }
+}
