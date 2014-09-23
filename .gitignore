@@ -15,6 +15,9 @@ lib-cov
 # public modules
 node_modules
 
+#azure account
+BizSpark-9-22-2014-credentials.publishsettings
+
 # Coverage directory used by tools like istanbul
 coverage
 
