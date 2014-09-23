@@ -118,12 +118,12 @@ if [ -e "$DEPLOYMENT_TARGET/package.json" ]; then
 fi
 
 # 4. Run node
-if [ -e "$DEPLOYMENT_TARGET/server/server.js" ]; then
-  cd "$DEPLOYMENT_TARGET/server"
-  node server.js
-  exitWithMessageOnError "node failed"
-  cd - > /dev/null
-fi
+# if [ -e "$DEPLOYMENT_TARGET/server/server.js" ]; then
+#   cd "$DEPLOYMENT_TARGET/server"
+#   node server.js
+#   exitWithMessageOnError "node failed"
+#   cd - > /dev/null
+# fi
 
 ##################################################################################################################################
 
