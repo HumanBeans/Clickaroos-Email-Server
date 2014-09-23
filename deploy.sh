@@ -123,6 +123,7 @@ if [ -e "$DEPLOYMENT_TARGET/server/server.js" ]; then
   node server.js
   exitWithMessageOnError "node failed"
   cd - > /dev/null
+fi
 
 ##################################################################################################################################
 
