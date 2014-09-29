@@ -15,7 +15,8 @@ var port = process.env.PORT || 3000;
 
 connection.connect();
 
-server.listen(port,function(){
+server.listen(port, function(err){
+  if(err) throw err;
   console.log('Express server listenning to ', port);
 });
 
