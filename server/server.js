@@ -1,42 +1,22 @@
-'use strict'
+'use strict';
 
 var express = require('express');
 var mysql = require('mysql');
-
+var connection = require('./config/dbconnection')
+var configExpress = require('./config/express');
+var routes = require('./routes');
 var app = express();
 
 var server = require('http').createServer(app);
+configExpress(app);
+routes(app);
 
-var config = {};
-config.dbConnect = {
-  host: 'us-cdbr-azure-west-a.cloudapp.net',
-  user: 'b017f8a5a6d3e8',
-  password: '46c0073d',
-  database: 'ClickagoosDB'
-};
-config.port = process.env.PORT || 3000;
-
-var connection = mysql.createConnection(config.dbConnect);
+var port = process.env.PORT || 3000;
 
 connection.connect();
 
-var helper = {};
-
-helper.counter = function(req,res){
-  connection.query('SELECT * FROM users', function(err,results){
-    if(err) res.send('err');
-    res.send(results);
-  })
-};
-
-server.listen(config.port,function(){
-  console.log('Express server listenning to ', config.port);
+server.listen(port,function(){
+  console.log('Express server listenning to ', port);
 });
-
-app.get('/', function(req,res){
-  res.send('hello world');
-});
-
-app.get('/counter', helper.counter);
 
 exports = module.exports = app;
