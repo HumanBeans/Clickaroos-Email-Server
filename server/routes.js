@@ -14,13 +14,10 @@ var ab = require('./ab_test/ab_test.controller.js');
 
 module.exports = function(app){
   // app.use('/clicks', imageRequestHandlers);
-
   
   app.get('/getImg', ab.getImage);
 
-  // called to display image when email is opened
   app.get('/showImg.png', ab.showImage);
-
   
   app.get('/deleteImg', ab.deleteImage);
 

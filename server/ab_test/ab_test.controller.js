@@ -3,24 +3,24 @@
 var query = require('./ab_test.queries.js');
 var fs = require('fs');
 
-// var dummyABTestID = 1;
-// var dummyEmail = joe@gmail.com;
-// var dummyImages = ['1432.png', '6565.png', '4545.png'];
 
-exports.serveImage = function(req, res, endTime) {
+// *** EMAIL SERVER FUNCTIONS ***
+exports.serveImage = function(req, res) {
   var abTestID = req.params.ab_testID;
   var userEmail = req.url.match(/\b[a-zA-Z0-9_.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+\b/g)[0];
-  var currentTime = new Date();
+  var endTime; //bookshelf query for end_time
+  var campaignImages, randomImage, winner;
 
+  if(abEndTimePassed(endTime)) {
+    //populate winner with bookshelf query for image with greatest clicks
+  } else {
+    // populate campaignImages with bookshelf query for all campaign images
+    randomImage = pickRandomImage(campaignImages);
+  }
 
-
-
-  //check for file on server
-  path.open('' + '.png', 'r', function(err, fd) {
-    var image = '';
-    if(err) exports.getImage(image);
-
-
+  if(winner) // serve winner
+  else if (randomImage) // serve randomImage 
+  else throw 'Error loading image'; 
 
   });
 };
@@ -53,4 +53,15 @@ exports.serveImage = function(req, res, endTime) {
   };
 
 
-};
+  // *** HELPER FUNCTIONS ***
+  var abEndTimePassed= function(endTime) {
+    var currentTime = new Date();
+    if (currentTime > endTime) return true;
+    else return false;
+  };
+
+  var pickRandomImage = function(imageArray) {
+    var length = imageArray.length;
+    var randomIndex = Math.floor(Math.random() * length);
+    return imageArray[randomIndex];
+  };
