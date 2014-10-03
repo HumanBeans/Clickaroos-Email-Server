@@ -48,4 +48,6 @@ memCache.prototype.addABTest = function( ABTestID, endTime ) {
   }
 };
 
-module.export = memCache;
+var memCache = new memCache();
+
+exports = memCache;
