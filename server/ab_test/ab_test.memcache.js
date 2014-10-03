@@ -83,6 +83,7 @@ MemCache.prototype.addABTest = function( ABTestID, endTime ) {
   }
 };
 
+<<<<<<< HEAD
 var memCache = new MemCache();
 <<<<<<< HEAD
 
@@ -95,3 +96,11 @@ console.log( memCache.getRedirectUrl( 3, 'armandopmj@gmail.com' ) )
 
 // exports = memCache;
 >>>>>>> (feat) add getRandomImg and getRedirectUrl methods to MemCache
+=======
+// var memCache = new MemCache();
+// memCache.addABTest( 3, 500000, [6, 'www.google.com', './somePicture.png'], [7, 'www.facebook.com', './somePicture7.png'] );
+// console.log( memCache.getRandomImg( 3, 'armandopmj@gmail.com' ) );
+// console.log( memCache.getRedirectUrl( 3, 'armandopmj@gmail.com' ) )
+
+exports = memCache;
+>>>>>>> (test) Comment out test data
