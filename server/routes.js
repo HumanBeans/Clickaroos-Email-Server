@@ -25,7 +25,7 @@ module.exports = function(app){
   // app.get('/img/ab/:ab_testID/*', ab.serveImage);
 
   app.get('/test', function(req, res) {
-    ab.getAssociatedImages({params: {url: {ab_testID: '1'}}, url: 'abc@def.com'},{}, 1);
+    ab.getAssociatedImages({params: {ab_testID: '1'}, url: 'abc@def.com'},{}, 1);
   });
 
   app.route('/').get(function(req, res){
