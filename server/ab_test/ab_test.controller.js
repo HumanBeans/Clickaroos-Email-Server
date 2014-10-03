@@ -5,8 +5,7 @@ var http = require('http');
 var fs = require('fs');
 var q = require('q');
 var bookshelf = require('../config/bookshelf_config.js');
-var abMem = require('./ab_test.memcache.js').cache;
-console.log('abMem check', abMem.addABTest);
+var abMem = require('./ab_test.memcache.js').memCache;
 
 var Image = bookshelf.Model.extend({
   tableName: 'ab_imgs'
@@ -19,6 +18,8 @@ var AbTest = bookshelf.Model.extend({
 // *** EMAIL SERVER FUNCTIONS ***
 exports.serveImage = function(req, res) {
   var abTestID = req.params.ab_testID;
+  // console.log('REQ: ', req);
+  // console.log('ABTESTID: ', abTestID);
   var userEmail = req.url.match(/\b[a-zA-Z0-9_.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+\b/g)[0];
   var endTime, campaignImages, servedImage;
 
@@ -28,7 +29,7 @@ exports.serveImage = function(req, res) {
     return;
   }
   
-  return 'WINNER WINNER CHICKEN DINNER';
+  return console.log('WINNER WINNER CHICKEN DINNER');
   // campaignImages = [];
   // endTime = abMem[abTestID].endTime;
   
@@ -58,7 +59,6 @@ exports.serveImage = function(req, res) {
     var imgUrl = typeof(req) === 'string' ? req : req.url.slice(8);
     var file = fs.createWriteStream(imgUrl);
     http.get("http://clickaroos.blob.core.windows.net/img/client/" + imgUrl, function(response) {
-      console.log(response); 
       response.pipe(file);
       console.log('get img is done');
     });
@@ -99,6 +99,7 @@ exports.serveImage = function(req, res) {
 
   // find all asset urls associated with ab test and trigger downloadImages
   exports.getAssociatedImages = function(res, req, abTestID) {
+    console.log('GETASSOCIATEDIMAGES CALLED');
     var imgModelArray = [];
     var imgArray = [];
     
@@ -117,22 +118,17 @@ exports.serveImage = function(req, res) {
     })
 
     .then(function(abModelArray) {
-      console.log('level 1');
-      console.log('abModelArray: ', abModelArray);
-
       var abMemArgs = [abTestID, abModelArray[0]['milliseconds_pick_winner']];
 
-      // populate imgArray with paths from Image models and write info to memcache
+      // populate imgArray with paths from Image models and write info to memCache
       imgModelArray.forEach(function(element, index, array) {
         var filePathString = element['ab_test_id'] + '_' + element['ab_imgs_id'] + '.png';
         abMemArgs.push([element['ab_test_id'], element['redirect_url'], filePathString]);
-        imgArray[index] = array[index]['asset_url'];
+        imgArray[index] = element['asset_url'];
       });
 
-      console.log(abMem);
-
       abMem.addABTest.apply(abMem, abMemArgs);
-      console.log(abMem);
+      console.log('ABMEM CHECK: ', abMem[abTestID]);
     })  
     // download images to server
     .then(function() {

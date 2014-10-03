@@ -16,7 +16,7 @@ MemCache.prototype.ABTestImgDBInfo = function( ABTestID ) {
 }
 
 MemCache.prototype.hasABTest = function( ABTestID ) {
-  return (ABTestID in this)
+  return (ABTestID in this);
 }
 
 
@@ -48,7 +48,6 @@ MemCache.prototype.addABTest = function( ABTestID, endTime ) {
   }
 };
 
-var cache = new MemCache();
-console.log('MemCache addabttest:', cache.addABTest);
+var memCache = new MemCache();
 
-exports.cache = cache;
+exports.memCache = memCache;
