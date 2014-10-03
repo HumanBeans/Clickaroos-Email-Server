@@ -15,13 +15,40 @@ MemCache.prototype.ABTestImgDBInfo = function( ABTestID ) {
   return results;
 }
 
+
 MemCache.prototype.hasABTest = function( ABTestID ) {
   return (ABTestID in this);
 }
 
 
-////////////////////////////////////////////////////////
-//  .addABTest() adds a new ABTest to a MemCache object
+// Gets the Redirect URL for the img viewed by the emial and increments the img clicks count
+MemCache.prototype.getRedirectUrl = function( ABTestID, email ){
+  imgs = this[ ABTestID ].imgs
+  for( var img in imgs ){
+    if( email in imgs[img].emails ) {
+      imgs[img].clicks++;
+      return imgs[img].redirectURL;
+    }
+  }
+}
+
+// Gets a random img, increments img's views, adds email to img's emial object
+MemCache.prototype.getRandomImg = function( ABTestID, email ){
+  var imgKeys = Object.keys( this[ABTestID].imgs );
+  var randomIndex = Math.floor( Math.random() * imgKeys.length );
+  var selectedImgKey = imgKeys[ randomIndex ];
+  this[ ABTestID ].imgs[ selectedImgKey ].emails[ email ] = email;
+  this[ ABTestID ].imgs[ selectedImgKey ].views++;
+  return this[ ABTestID ].imgs[ selectedImgKey ].fileLocation;
+}
+
+MemCache.prototype.hasABTest = function( ABTestID ) {
+  return (ABTestID in this)
+}
+
+
+///////////////////////////////////////////////////////////////////////
+//  .addABTest() adds a new ABTest to a memCache object
 //
 //  MemCacheExample.addABTest( 
 //    ABTestID, 
@@ -51,3 +78,7 @@ MemCache.prototype.addABTest = function( ABTestID, endTime ) {
 var memCache = new MemCache();
 
 exports.memCache = memCache;
+
+// memCache.addABTest( 3, 500000, [6, 'www.google.com', './somePicture.png'], [7, 'www.facebook.com', './somePicture7.png'] );
+// console.log( memCache.getRandomImg( 3, 'armandopmj@gmail.com' ) );
+// console.log( memCache.getRedirectUrl( 3, 'armandopmj@gmail.com' ) )
