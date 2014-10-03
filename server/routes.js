@@ -10,6 +10,7 @@
 var express = require('express');
 var fs = require('fs');
 var ab = require('./ab_test/ab_test.controller.js');
+var siteRedirect = require('./ab_test/site_redirect/main');
 
 module.exports = function(app){
   // app.use('/clicks', imageRequestHandlers);
@@ -27,6 +28,8 @@ module.exports = function(app){
   app.get('/test', function(req, res) {
     ab.getAssociatedImages({params: {ab_testID: '1'}, url: 'abc@def.com'},{}, 1);
   });
+
+  app.use('/site/ab/:ab_testID/*', siteRedirect);
 
   app.route('/').get(function(req, res){
     res.send('hello world');
