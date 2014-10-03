@@ -1,9 +1,9 @@
-// Module for creating a memcache object
+// Module for creating a MemCache object
 
-var memCache = function() { 
+var MemCache = function() { 
 };
 
-memCache.prototype.ABTestImgDBInfo = function( ABTestID ) {
+MemCache.prototype.ABTestImgDBInfo = function( ABTestID ) {
   var results = {}, imgs = this[ ABTestID ].imgs, totalViews = 0, totalClicks = 0;
   for( var img in imgs ){
     totalViews += imgs[img].views;
@@ -15,22 +15,22 @@ memCache.prototype.ABTestImgDBInfo = function( ABTestID ) {
   return results;
 }
 
-memCache.prototype.hasABTest = function( ABTestID ) {
+MemCache.prototype.hasABTest = function( ABTestID ) {
   return (ABTestID in this)
 }
 
 
 ////////////////////////////////////////////////////////
-//  .addABTest() adds a new ABTest to a memCache object
+//  .addABTest() adds a new ABTest to a MemCache object
 //
-//  memCacheExample.addABTest( 
+//  MemCacheExample.addABTest( 
 //    ABTestID, 
 //    endTime, 
 //    [ imgID1, redirectURL1, fileLocation1 ],
 //    [ imgID2, redirectURL2, fileLocation2 ],... 
 //  );
 
-memCache.prototype.addABTest = function( ABTestID, endTime ) {
+MemCache.prototype.addABTest = function( ABTestID, endTime ) {
   this[ ABTestID ] = 
     { imgs: { },
       endTime: endTime
@@ -48,6 +48,7 @@ memCache.prototype.addABTest = function( ABTestID, endTime ) {
   }
 };
 
-var memCache = new memCache();
+var cache = new MemCache();
+console.log('MemCache addabttest:', cache.addABTest);
 
-exports = memCache;
+exports.cache = cache;

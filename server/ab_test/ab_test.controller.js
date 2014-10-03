@@ -5,10 +5,15 @@ var http = require('http');
 var fs = require('fs');
 var q = require('q');
 var bookshelf = require('../config/bookshelf_config.js');
-// var mem = require('../memcache.js');
+var abMem = require('./ab_test.memcache.js').cache;
+console.log('abMem check', abMem.addABTest);
 
 var Image = bookshelf.Model.extend({
   tableName: 'ab_imgs'
+});
+
+var AbTest = bookshelf.Model.extend({
+  tableName: 'ab_tests'
 });
 
 // *** EMAIL SERVER FUNCTIONS ***
@@ -18,32 +23,32 @@ exports.serveImage = function(req, res) {
   var endTime, campaignImages, servedImage;
 
   // check memcache, if !in memcache, ping DB for campaign end_time, convert to Date() format
-  // FLAG: CHECK ALL VAR NAMES BELOW FOR COMPATIBILITY WITH MEMCACHE VAR NAMES
-  if(!abTestID in mem.memCache) {
+  if(!abMem.hasABTest(abTestID)) {
     exports.getAssociatedImages(req, res, abTestID);
     return;
   }
-
-  campaignImages = [];
-  endTime = mem.cache[abTestID].endTime;
   
-  for(var img in mem.cache[abTestID].imgs) {
-    campaignImages.push(img.fileName);
-  } 
+  return 'WINNER WINNER CHICKEN DINNER';
+  // campaignImages = [];
+  // endTime = abMem[abTestID].endTime;
+  
+  // for(var img in abMem[abTestID].imgs) {
+  //   campaignImages.push(img.fileName);
+  // } 
 
-  if(abEndTimePassed(endTime)) {
-    // populate winner *** How will we know which is winner on memcache without pinging DB???
-    servedImage; // most clicks
+  // if(abEndTimePassed(endTime)) {
+  //   // populate winner *** How will we know which is winner on memcache without pinging DB???
+  //   servedImage; // most clicks
       
-      // if URL !in memcache -> get image from blob
+  //     // if URL !in memcache -> get image from blob
 
-  } else {
-    // populate campaignImages with campaign URLs
-      // if URLs !in memcache -> get images from blob
+  // } else {
+  //   // populate campaignImages with campaign URLs
+  //     // if URLs !in memcache -> get images from blob
 
-    servedImage = pickRandomImage(campaignImages);
-  }
-  //serve servedImage
+  //   servedImage = pickRandomImage(campaignImages);
+  // }
+  // //serve servedImage
 };
 
 
@@ -94,33 +99,50 @@ exports.serveImage = function(req, res) {
 
   // find all asset urls associated with ab test and trigger downloadImages
   exports.getAssociatedImages = function(res, req, abTestID) {
+    var imgModelArray = [];
     var imgArray = [];
     
     // query db for image models associated with ab test id
     Image.collection().query().where({
       ab_test_id: abTestID
-    }).select()
+    })
+    .select()
+    //query db for end time
+    .then(function(result) {
+      imgModelArray = result;
 
-    // populate imgArray with paths from Image models and write info to memcache
-    .then(function(modelArray) {
+      return AbTest.collection().query().where({
+        ab_test_id: abTestID
+      }).select();
+    })
+
+    .then(function(abModelArray) {
       console.log('level 1');
-      modelArray.forEach(function(element, index, array) {
+      console.log('abModelArray: ', abModelArray);
+
+      var abMemArgs = [abTestID, abModelArray[0]['milliseconds_pick_winner']];
+
+      // populate imgArray with paths from Image models and write info to memcache
+      imgModelArray.forEach(function(element, index, array) {
+        var filePathString = element['ab_test_id'] + '_' + element['ab_imgs_id'] + '.png';
+        abMemArgs.push([element['ab_test_id'], element['redirect_url'], filePathString]);
         imgArray[index] = array[index]['asset_url'];
       });
 
-      //TODO: write to memcache
-    })
+      console.log(abMem);
 
+      abMem.addABTest.apply(abMem, abMemArgs);
+      console.log(abMem);
+    })  
     // download images to server
     .then(function() {
       console.log('level 2');
       downloadImages(res, req, imgArray);
     })
-
-    // call serveImages again now that images have been downloaded to server
+    // call serveImage again now that images have been downloaded to server
     .then(function() {
       console.log('level 3');
-      exports.serveImages(res, req);
+      exports.serveImage(res, req);
     })
     .catch(function(err) {
       console.log(err);
