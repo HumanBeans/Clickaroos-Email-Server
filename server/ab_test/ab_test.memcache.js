@@ -3,6 +3,42 @@
 var MemCache = function() { 
 };
 
+
+MemCache.prototype.winnerExists = function(ABTestID) {
+  if(this[ ABTestID ].winner) {
+    return true;
+  }
+  return false;
+}
+
+
+MemCache.prototype.selectWinner = function(ABTestID) {
+  var highestClickImageID;
+  var highestClickThroughRate = 0;
+  var imgs = this[ ABTestID ].imgs;
+  var currentImage_clickThroughRate;
+
+  // Check through the imageID images for highest clicks
+  for( var img_id in imgs ) {
+    if(!imgs[img_id].views) { 
+      currentImage_clickThroughRate = 0;
+    } else {
+      currentImage_clickThroughRate = imgs[img_id].clicks / imgs[img_id].views;
+    }
+
+    if( currentImage_clickThroughRate > highestClickThroughRate ) {
+      highestClickThroughRate = currentImage_clickThroughRate;
+      highestClickImageID = img_id;
+    }
+  }
+
+  // Set the winner
+  this[ ABTestID ].winner = this[ ABTestID].imgs[ highestClickImageID ];
+  console.log( 'this is the winner!: ', this[ ABTestID ].winner );
+  return highestClickImageID;
+}
+
+
 MemCache.prototype.ABTestImgDBInfo = function( ABTestID ) {
   var results = {}, imgs = this[ ABTestID ].imgs, totalViews = 0, totalClicks = 0;
   for( var img in imgs ){
@@ -21,18 +57,20 @@ MemCache.prototype.hasABTest = function( ABTestID ) {
 }
 
 
-// Gets the Redirect URL for the img viewed by the emial and increments the img clicks count
+// Gets the Redirect URL for the img viewed by the email and increments the img clicks count
 MemCache.prototype.getRedirectUrl = function( ABTestID, email ){
-  imgs = this[ ABTestID ].imgs
+  console.log('abid', this[ ABTestID ]);
+  imgs = this[ ABTestID ].imgs;
   for( var img in imgs ){
     if( email in imgs[img].emails ) {
       imgs[img].clicks++;
-      return imgs[img].redirectURL;
+      var redir = imgs[img].redirectURL;
     }
   }
+  return redir;
 }
 
-// Gets a random img, increments img's views, adds email to img's emial object
+// Gets a random img, increments img's views, adds email to img's email object
 MemCache.prototype.getRandomImg = function( ABTestID, email ){
   var imgKeys = Object.keys( this[ABTestID].imgs );
   var randomIndex = Math.floor( Math.random() * imgKeys.length );
@@ -60,9 +98,10 @@ MemCache.prototype.hasABTest = function( ABTestID ) {
 MemCache.prototype.addABTest = function( ABTestID, endTime ) {
   this[ ABTestID ] = 
     { imgs: { },
-      endTime: endTime
+      endTime: endTime,
+      winner: null
     }
-  
+
   for( var i = 2; i < arguments.length; i++ ){
     this[ ABTestID ].imgs[ arguments[i][0] ] = 
       { 
