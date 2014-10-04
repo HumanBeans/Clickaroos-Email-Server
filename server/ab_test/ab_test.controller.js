@@ -55,10 +55,21 @@ exports.serveImage = function(req, res) {
 
 
   // retrieve stored image from Azure blob
-  exports.getImage = function(req) {
-    var imgUrl = typeof(req) === 'string' ? req : req.url.slice(8);
-    var file = fs.createWriteStream(imgUrl);
-    http.get("http://clickaroos.blob.core.windows.net/img/client/" + imgUrl, function(response) {
+  // exports.getImage = function(req) {
+  //   console.log('req: ', req);
+  //   var imgUrl = typeof(req) === 'string' ? req : req.url.slice(8);
+  //   var file = fs.createWriteStream(imgUrl);
+  //   http.get("http://clickaroos.blob.core.windows.net/img/client/" + imgUrl, function(response) {
+  //     response.pipe(file);
+  //     console.log('get img is done');
+  //   });
+  // };
+
+  exports.getImage = function(imageUrl, imageName) {
+    // console.log('req: ', req);
+    // var imgUrl = typeof(req) === 'string' ? req : req.url.slice(8);
+    var file = fs.createWriteStream(imageName);
+    http.get(imageUrl, function(response) {
       response.pipe(file);
       console.log('get img is done');
     });
@@ -100,8 +111,9 @@ exports.serveImage = function(req, res) {
   // find all asset urls associated with ab test and trigger downloadImages
   exports.getAssociatedImages = function(res, req, abTestID) {
     console.log('GETASSOCIATEDIMAGES CALLED');
+    console.log('req: ', req);
     var imgModelArray = [];
-    var imgArray = [];
+    var imgPathAssetUrl = {};
     
     // query db for image models associated with ab test id
     Image.collection().query().where({
@@ -120,12 +132,12 @@ exports.serveImage = function(req, res) {
     .then(function(abModelArray) {
       var abMemArgs = [abTestID, abModelArray[0]['milliseconds_pick_winner']];
 
-      // populate imgArray with paths from Image models and write info to memCache
+      // populate imgPathAssetUrl with paths from Image models and write info to memCache
       imgModelArray.forEach(function(element, index, array) {
         var filePathString = element['ab_test_id'] + '_' + element['ab_imgs_id'] + '.png';
-        abMemArgs.push([element['ab_test_id'], element['redirect_url'], filePathString]);
-        imgArray[index] = element['asset_url'];
-      });
+        abMemArgs.push([element['ab_imgs_id'], element['redirect_url'], filePathString]);
+        imgPathAssetUrl[element['ab_imgs_id']] = { asset_url: element['asset_url'], filePathString: filePathString };
+      })
 
       abMem.addABTest.apply(abMem, abMemArgs);
       console.log('ABMEM CHECK: ', abMem[abTestID]);
@@ -133,7 +145,7 @@ exports.serveImage = function(req, res) {
     // download images to server
     .then(function() {
       console.log('level 2');
-      downloadImages(res, req, imgArray);
+      downloadImages(res, req, imgPathAssetUrl);
     })
     // call serveImage again now that images have been downloaded to server
     .then(function() {
@@ -146,14 +158,10 @@ exports.serveImage = function(req, res) {
   };
 
   // download all images from Azure blob and trigger serveImages
-  var downloadImages = function(req, res, imgArray) {
-    imgArray.forEach(function(element, index, array) {
-      exports.getImage(array[index]);
-    });
+  var downloadImages = function(req, res, imgPathAssetUrl) {
+    console.log('downloading images: ', res);
+    for( var imgId in imgPathAssetUrl ) {
+      console.log( imgId, imgPathAssetUrl );
+      exports.getImage( imgPathAssetUrl[imgId].asset_url, imgPathAssetUrl[imgId].filePathString );
+    }
   };
-
-
-
-
-
-
