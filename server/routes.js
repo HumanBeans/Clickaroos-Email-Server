@@ -23,13 +23,14 @@ module.exports = function(app){
   
   app.get('/deleteImg', ab.deleteImage);
 
-  // app.get('/img/ab/:ab_testID/*', ab.serveImage);
+  app.get('/img/ab/:ab_testID/*', ab.serveImage);
 
   app.get('/test', function(req, res) {
-    ab.getAssociatedImages({params: {ab_testID: '45'}, url: 'abc@def.com'},{}, 45);
+    ab.getAssociatedImages({params: {ab_testID: '46'}, url: 'abc@def.com'},{}, 46);
   });
 
-  app.use('/site/ab/:ab_testID/*', siteRedirect);
+  app.use('/site/ab', siteRedirect);
+  // app.use('/site/ab/:ab_testID/*', siteRedirect);
 
   app.route('/').get(function(req, res){
     res.send('hello world');

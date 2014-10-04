@@ -15,13 +15,19 @@ var AbTest = bookshelf.Model.extend({
   tableName: 'ab_tests'
 });
 
+// Fake endTime = true after 60 seconds
+// var fake = false;
+// setTimeout(function() {
+//   fake = true;
+// }, 60000);
+
 // *** EMAIL SERVER FUNCTIONS ***
 exports.serveImage = function(req, res) {
   var abTestID = req.params.ab_testID;
   // console.log('REQ: ', req);
   // console.log('ABTESTID: ', abTestID);
   var userEmail = req.url.match(/\b[a-zA-Z0-9_.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+\b/g)[0];
-  var endTime, campaignImages, servedImage;
+  var campaignImages, servedImage;
 
   // check memcache, if !in memcache, ping DB for campaign end_time, convert to Date() format
   if(!abMem.hasABTest(abTestID)) {
@@ -29,7 +35,36 @@ exports.serveImage = function(req, res) {
     return;
   }
   
-  return console.log('WINNER WINNER CHICKEN DINNER');
+  // If there is winner
+  if( abMem.winnerExists(abTestID) ) {
+    // Show winner
+    var imageLoc = abMem[ abTestID ].winner.fileLocation;
+    console.log('1: image_loc ', imageLoc);
+    return exports.showImage(req, res, imageLoc);
+  }
+  // If there is !winner && endTime has passed 
+  else if ( !abMem.winnerExists(abTestID) && abEndTimePassed(abTestID) ) {
+  // else if ( !abMem.winnerExists(abTestID) && fake ) {
+    // Set a winner
+    abMem.selectWinner(abTestID);
+
+    // Show winner
+    console.log('why is it in here');
+    var imageLoc = abMem[ abTestID ].winner.fileLocation;
+    console.log('2: image_loc ', imageLoc);
+    return exports.showImage(req, res, imageLoc);
+  }
+  // If endTime hasn't passed
+  else {
+    // Show random image
+    var imageLoc = abMem.getRandomImg(abTestID, userEmail);
+    console.log('3: image_loc ', imageLoc);
+    return exports.showImage(req, res, imageLoc);
+  }
+
+
+
+  // return console.log('WINNER WINNER CHICKEN DINNER');
   // campaignImages = [];
   // endTime = abMem[abTestID].endTime;
   
@@ -76,11 +111,11 @@ exports.serveImage = function(req, res) {
   };
 
   // display image when email is opened
-  exports.showImage = function(req, res) {
+  exports.showImage = function(req, res, imagePath) {
     res.writeHead(200, {
      'Content-Type' : 'image/png'
     });
-   fs.createReadStream('./bg.jpg', { 'bufferSize': 4 * 1024 }).pipe(res);
+   fs.createReadStream(imagePath, { 'bufferSize': 4 * 1024 }).pipe(res);
   };
 
   // delete image from server when no longer required
@@ -95,17 +130,11 @@ exports.serveImage = function(req, res) {
   // *** HELPER FUNCTIONS ***
 
   // check if ab test trial period has elapsed
-  var abEndTimePassed = function(endTime) {
+  var abEndTimePassed = function(abTestID) {
+    var endTime = abMem[abTestID].endTime;
     var currentTime = new Date();
     if (currentTime > endTime) return true;
     else return false;
-  };
-
-  // select random image to serve for ab test
-  var pickRandomImage = function(imageArray) {
-    var length = imageArray.length;
-    var randomIndex = Math.floor(Math.random() * length);
-    return imageArray[randomIndex];
   };
 
   // find all asset urls associated with ab test and trigger downloadImages
@@ -131,7 +160,7 @@ exports.serveImage = function(req, res) {
 
     .then(function(abModelArray) {
       var abMemArgs = [abTestID, abModelArray[0]['milliseconds_pick_winner']];
-
+      // './server/client_images/' + 
       // populate imgPathAssetUrl with paths from Image models and write info to memCache
       imgModelArray.forEach(function(element, index, array) {
         var filePathString = element['ab_test_id'] + '_' + element['ab_imgs_id'] + '.png';
@@ -144,13 +173,14 @@ exports.serveImage = function(req, res) {
     })  
     // download images to server
     .then(function() {
-      console.log('level 2');
       downloadImages(res, req, imgPathAssetUrl);
     })
     // call serveImage again now that images have been downloaded to server
     .then(function() {
-      console.log('level 3');
-      exports.serveImage(res, req);
+      setTimeout(function() {
+        exports.serveImage(res, req);
+      }, 2500);
+      
     })
     .catch(function(err) {
       console.log(err);

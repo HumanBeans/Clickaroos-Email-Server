@@ -2,14 +2,17 @@
 
 // var memCache = {};
 // TODO: Require the appropriate memcache file
-var memCache = require('../ab_test_memcache').memCache;
+var memCache = require('../ab_test.memcache').memCache;
 
 var bookshelf = require('../../config/bookshelf_config');
 var ABImg = bookshelf.Model.extend({ tableName: 'ab_imgs' });
 
 exports.serveSite = function(req, res) {
-  var abTestID = req.params.ab_testID;
-  var userEmail = req.url.match(/\b[a-zA-Z0-9_.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+\b/g)[0];
+  var abTestID = req.params.abTestID;
+  console.log('abTestID ', abTestID);
+  // var userEmail = req.url.match(/\b[a-zA-Z0-9_.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+\b/g)[0];
+  var userEmail = req.originalUrl.split('/').pop();
+  console.log('useremail: ', userEmail);
 
   var redirectUrl = memCache.getRedirectUrl(abTestID, userEmail);
 
