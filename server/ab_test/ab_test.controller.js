@@ -26,65 +26,49 @@ exports.serveImage = function(req, res) {
   var abTestID = req.params.ab_testID;
   // console.log('REQ: ', req);
   // console.log('ABTESTID: ', abTestID);
-  var userEmail = req.url.match(/\b[a-zA-Z0-9_.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+\b/g)[0];
+  // var userEmail = req.url.match(/\b[a-zA-Z0-9_.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+\b/g)[0];
+  var userEmail = req.url.split('.png')[0].split('/').pop();
+  // console.log(req.url);
+  console.log('[serveImg] userEmail: ', userEmail);
   var campaignImages, servedImage;
+
+  var serveImgLogic = function() {
+    // If there is winner
+    if( abMem.winnerExists(abTestID) ) {
+      // Show winner
+      var imageLoc = abMem[ abTestID ].winner.fileLocation;
+      console.log('1: image_loc ', imageLoc);
+      return exports.showImage(req, res, imageLoc);
+    }
+    // If there is !winner && endTime has passed 
+    else if ( !abMem.winnerExists(abTestID) && abEndTimePassed(abTestID) ) {
+    // else if ( !abMem.winnerExists(abTestID) && fake ) {
+      // Set a winner
+      abMem.selectWinner(abTestID);
+
+      // Show winner
+      console.log('why is it in here');
+      var imageLoc = abMem[ abTestID ].winner.fileLocation;
+      console.log('2: image_loc ', imageLoc);
+      return exports.showImage(req, res, imageLoc);
+    }
+    // If endTime hasn't passed
+    else {
+      // Show random image
+      var imageLoc = abMem.getRandomImg(abTestID, userEmail);
+      console.log('3: image_loc ', imageLoc);
+      return exports.showImage(req, res, imageLoc);
+    }
+  }
 
   // check memcache, if !in memcache, ping DB for campaign end_time, convert to Date() format
   if(!abMem.hasABTest(abTestID)) {
     exports.getAssociatedImages(req, res, abTestID);
-    return;
+  } else {
+    serveImgLogic();
   }
   
-  // If there is winner
-  if( abMem.winnerExists(abTestID) ) {
-    // Show winner
-    var imageLoc = abMem[ abTestID ].winner.fileLocation;
-    console.log('1: image_loc ', imageLoc);
-    return exports.showImage(req, res, imageLoc);
-  }
-  // If there is !winner && endTime has passed 
-  else if ( !abMem.winnerExists(abTestID) && abEndTimePassed(abTestID) ) {
-  // else if ( !abMem.winnerExists(abTestID) && fake ) {
-    // Set a winner
-    abMem.selectWinner(abTestID);
 
-    // Show winner
-    console.log('why is it in here');
-    var imageLoc = abMem[ abTestID ].winner.fileLocation;
-    console.log('2: image_loc ', imageLoc);
-    return exports.showImage(req, res, imageLoc);
-  }
-  // If endTime hasn't passed
-  else {
-    // Show random image
-    var imageLoc = abMem.getRandomImg(abTestID, userEmail);
-    console.log('3: image_loc ', imageLoc);
-    return exports.showImage(req, res, imageLoc);
-  }
-
-
-
-  // return console.log('WINNER WINNER CHICKEN DINNER');
-  // campaignImages = [];
-  // endTime = abMem[abTestID].endTime;
-  
-  // for(var img in abMem[abTestID].imgs) {
-  //   campaignImages.push(img.fileName);
-  // } 
-
-  // if(abEndTimePassed(endTime)) {
-  //   // populate winner *** How will we know which is winner on memcache without pinging DB???
-  //   servedImage; // most clicks
-      
-  //     // if URL !in memcache -> get image from blob
-
-  // } else {
-  //   // populate campaignImages with campaign URLs
-  //     // if URLs !in memcache -> get images from blob
-
-  //   servedImage = pickRandomImage(campaignImages);
-  // }
-  // //serve servedImage
 };
 
 
@@ -140,7 +124,7 @@ exports.serveImage = function(req, res) {
   // find all asset urls associated with ab test and trigger downloadImages
   exports.getAssociatedImages = function(res, req, abTestID) {
     console.log('GETASSOCIATEDIMAGES CALLED');
-    console.log('req: ', req);
+    // console.log('req: ', req);
     var imgModelArray = [];
     var imgPathAssetUrl = {};
     
@@ -177,19 +161,20 @@ exports.serveImage = function(req, res) {
     })
     // call serveImage again now that images have been downloaded to server
     .then(function() {
+      console.log('outside setTimeout');
       setTimeout(function() {
         exports.serveImage(res, req);
-      }, 2500);
-      
+        console.log('inside setTimeout');
+      }, 5000);
     })
     .catch(function(err) {
-      console.log(err);
+      console.log('error: ', err);
     });
   };
 
   // download all images from Azure blob and trigger serveImages
   var downloadImages = function(req, res, imgPathAssetUrl) {
-    console.log('downloading images: ', res);
+    console.log('downloading_images');
     for( var imgId in imgPathAssetUrl ) {
       console.log( imgId, imgPathAssetUrl );
       exports.getImage( imgPathAssetUrl[imgId].asset_url, imgPathAssetUrl[imgId].filePathString );
