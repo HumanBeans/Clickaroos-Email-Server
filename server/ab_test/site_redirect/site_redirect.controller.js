@@ -1,4 +1,4 @@
-'use strict';
+// 'use strict';
 
 // var memCache = {};
 // TODO: Require the appropriate memcache file

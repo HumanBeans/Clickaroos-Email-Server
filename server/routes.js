@@ -1,4 +1,4 @@
-'use strict';
+// 'use strict';
 
 //####### to be included later when done with the exports file
 // var imageRequestHandlers = require('./api/')

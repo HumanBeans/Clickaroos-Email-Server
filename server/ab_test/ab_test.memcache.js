@@ -1,4 +1,4 @@
-'use strict'
+// 'use strict';
 
 // var bookshelf = require('../config/bookshelf_config');
 
@@ -127,7 +127,7 @@ MemCache.prototype.addABTest = function( ABTestID, endTime ) {
 };
 
 // MemCache.prototype.syncToDatabase = function(){
-  
+
 // }
 
 var memCache = new MemCache();

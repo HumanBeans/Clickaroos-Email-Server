@@ -1,4 +1,4 @@
-'use strict';
+// 'use strict';
 
 var app = require('../../server.js');
 var bookshelf = require('../../config/bookshelf_config.test');
