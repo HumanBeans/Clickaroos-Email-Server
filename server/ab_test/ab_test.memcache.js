@@ -1,3 +1,15 @@
+'use strict'
+
+// var bookshelf = require('../config/bookshelf_config');
+
+// var Image = bookshelf.Model.extend({
+//   tableName: 'ab_imgs'
+// });
+
+// var AbTest = bookshelf.Model.extend({
+//   tableName: 'ab_tests'
+// });
+
 // Module for creating a MemCache object
 
 var MemCache = function() { 
@@ -113,6 +125,10 @@ MemCache.prototype.addABTest = function( ABTestID, endTime ) {
       }
   }
 };
+
+// MemCache.prototype.syncToDatabase = function(){
+  
+// }
 
 var memCache = new MemCache();
 
