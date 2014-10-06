@@ -19,7 +19,7 @@ exports.serveSite = function(req, res) {
   // If AB Test or redirectUrl doesn't exist
   if(!memCache[abTestID] || !redirectUrl) { return res.status(404); }
 
-  return res.redirect(redirectUrl);
+  res.redirect(redirectUrl);
 
   // for(var imgID in memCache[abTestID].img) {
   //   // Increment clicks for proper image
