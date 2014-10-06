@@ -1,4 +1,4 @@
-'use strict';
+// 'use strict';
 
 var query = require('./ab_test.queries.js');
 var http = require('http');
