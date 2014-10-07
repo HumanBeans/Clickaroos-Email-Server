@@ -70,12 +70,13 @@ MemCache.prototype.hasABTest = function( ABTestID ) {
 
 
 // Gets the Redirect URL for the img viewed by the email and increments the img clicks count
-MemCache.prototype.getRedirectUrl = function( ABTestID, email ){
+MemCache.prototype.getRedirectUrl = function( ABTestID, email, timeClicked ){
   console.log('abid', this[ ABTestID ]);
   imgs = this[ ABTestID ].imgs;
   for( var img in imgs ){
     if( email in imgs[img].emails ) {
       imgs[img].clicks++;
+      this[ ABTestID ].clickTime[ timeClicked ]++;
       var redir = imgs[img].redirectURL;
     }
   }
@@ -83,12 +84,13 @@ MemCache.prototype.getRedirectUrl = function( ABTestID, email ){
 }
 
 // Gets a random img, increments img's views, adds email to img's email object
-MemCache.prototype.getRandomImg = function( ABTestID, email ){
+MemCache.prototype.getRandomImg = function( ABTestID, email, timeViewed ){
   var imgKeys = Object.keys( this[ABTestID].imgs );
   var randomIndex = Math.floor( Math.random() * imgKeys.length );
   var selectedImgKey = imgKeys[ randomIndex ];
   this[ ABTestID ].imgs[ selectedImgKey ].emails[ email ] = email;
   this[ ABTestID ].imgs[ selectedImgKey ].views++;
+  this[ ABTestID ].viewTime[ timeViewed ]++;
   return this[ ABTestID ].imgs[ selectedImgKey ].fileLocation;
 }
 
@@ -111,6 +113,10 @@ MemCache.prototype.addABTest = function( ABTestID, endTime ) {
   this[ ABTestID ] = 
     { imgs: { },
       endTime: endTime,
+      viewTime: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0,
+        12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0 },
+      clickTime: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0,
+        12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0 },
       winner: null
     }
 
