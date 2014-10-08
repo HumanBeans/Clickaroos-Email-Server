@@ -38,7 +38,7 @@ exports.updateCampaignsClicksAndViews = function( that, ABTestID ) {
                    .then(function( campaignRow ){
                       // campaignClicks = campaignRow.attributes.clicks + totalClicks;
                       Campaigns.where( { campaign_id: campaignID } )
-                               .save( { clicks: campaignClicks, views: totalViews }, {method: 'update'} );
+                               .save( { clicks: totalClicks, views: totalViews }, {method: 'update'} );
                    })
         }) 
 };
