@@ -165,6 +165,7 @@ MemCache.prototype.addABTest = function( ABTestID, endTime ) {
 
 MemCache.prototype.syncToDatabase = function( ABTestID ){
   //Update sql schema for winner view and clicks
+<<<<<<< HEAD
  
   //Override clicks and views for each image
   //Override views for the campaign
@@ -210,6 +211,16 @@ var syncWinner = function(ABTestID, context) {
     .then(function(ab_test) {
     });
 }
+=======
+
+  //Override clicks and views for each image
+  //Override views for the campaign
+  //Override clicks for the campaign
+  //Override click time for ab_test_id
+  //Override view time for ab_test_id
+  //If winner selected update winner views and clicks
+};
+>>>>>>> (add setInterval in memcache for DB queries)
 
 var memCache = new MemCache();
 
