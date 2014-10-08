@@ -23,6 +23,7 @@ var AbTest = bookshelf.Model.extend({
 
 // *** EMAIL SERVER FUNCTIONS ***
 exports.serveImage = function(req, res) {
+  var currentHour = new Date().getHours();
   var abTestID = req.params.ab_testID;
   // console.log('REQ: ', req);
   // console.log('ABTESTID: ', abTestID);
@@ -38,6 +39,7 @@ exports.serveImage = function(req, res) {
       // Show winner
       var imageLoc = abMem[ abTestID ].winner.fileLocation;
       console.log('1: image_loc ', imageLoc);
+      abMem.winnerViewed(abTestID, userEmail, currentHour);
       return exports.showImage(req, res, imageLoc);
     }
     // If there is !winner && endTime has passed 
@@ -50,12 +52,13 @@ exports.serveImage = function(req, res) {
       console.log('why is it in here');
       var imageLoc = abMem[ abTestID ].winner.fileLocation;
       console.log('2: image_loc ', imageLoc);
+      abMem.winnerViewed(abTestID, userEmail, currentHour);
       return exports.showImage(req, res, imageLoc);
     }
     // If endTime hasn't passed
     else {
       // Show random image
-      var imageLoc = abMem.getRandomImg(abTestID, userEmail);
+      var imageLoc = abMem.getRandomImg(abTestID, userEmail, currentHour);
       console.log('3: image_loc ', imageLoc);
       return exports.showImage(req, res, imageLoc);
     }

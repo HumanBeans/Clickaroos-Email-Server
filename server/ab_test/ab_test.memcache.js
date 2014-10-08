@@ -94,6 +94,12 @@ MemCache.prototype.getRandomImg = function( ABTestID, email, timeViewed ){
   return this[ ABTestID ].imgs[ selectedImgKey ].fileLocation;
 }
 
+MemCache.prototype.winnerViewed = function( ABTestID, email, timeViewed ) {
+ this[ ABTestID ].winner.emails[ email ] = email;
+ this[ ABTestID ].winner.views++;
+ this[ ABTestID ].viewTime[ timeViewed ]++;
+}
+
 MemCache.prototype.hasABTest = function( ABTestID ) {
   return (ABTestID in this)
 }
