@@ -1,6 +1,12 @@
 // 'use strict';
 
+<<<<<<< HEAD
 var bookshelf = require('../config/bookshelf_config');
+=======
+var updateImgsClicksAndViews = require('./ab_test.memcache.helpers').updateImgsClicksAndViews;
+var updateCampaignsClicksAndViews = require('./ab_test.memcache.helpers').updateCampaignsClicksAndViews;
+// var bookshelf = require('../config/bookshelf_config');
+>>>>>>> (feat) INSERT memcache campaigns and ab_img data
 
 var Image = bookshelf.Model.extend({
   tableName: 'ab_imgs'
@@ -69,7 +75,7 @@ MemCache.prototype.selectWinner = function(ABTestID) {
 
 
 MemCache.prototype.ABTestImgDBInfo = function( ABTestID ) {
-  var results = {}, imgs = this[ ABTestID ].imgs, totalViews = 0, totalClicks = 0;
+  var results = {}, ab_imgs = this[ ABTestID ].imgs, totalViews = 0, totalClicks = 0;
   for( var img in imgs ){
     totalViews += imgs[img].views;
     totalClicks += imgs[img].clicks;
@@ -164,6 +170,7 @@ MemCache.prototype.addABTest = function( ABTestID, endTime ) {
 };
 
 MemCache.prototype.syncToDatabase = function( ABTestID ){
+  console.log( 'syncToDatabase' );
   //Update sql schema for winner view and clicks
 <<<<<<< HEAD
  
@@ -214,8 +221,11 @@ var syncWinner = function(ABTestID, context) {
 =======
 
   //Override clicks and views for each image
-  //Override views for the campaign
-  //Override clicks for the campaign
+  updateImgsClicksAndViews( this, ABTestID );
+
+  //Override views and clicks for the campaign
+  updateCampaignsClicksAndViews( this, ABTestID );
+
   //Override click time for ab_test_id
   //Override view time for ab_test_id
   //If winner selected update winner views and clicks
