@@ -46,12 +46,12 @@ exports.serveImage = function(req, res) {
     else if ( !abMem.winnerExists(abTestID) && abEndTimePassed(abTestID) ) {
     // else if ( !abMem.winnerExists(abTestID) && fake ) {
       // Set a winner
+      console.log('Selecting Winner');
       abMem.selectWinner(abTestID);
 
+      console.log('Winner is: ', abTestID);
       // Show winner
-      console.log('why is it in here');
       var imageLoc = abMem[ abTestID ].winner.fileLocation;
-      console.log('2: image_loc ', imageLoc);
       abMem.winnerViewed(abTestID, userEmail, currentHour);
       return exports.showImage(req, res, imageLoc);
     }
