@@ -13,8 +13,12 @@ var AbTest = bookshelf.Model.extend({
 exports.updateImgsClicksAndViews = function( that, ABTestID ) {
   var ab_imgs = that[ ABTestID ].imgs;
   for( var img in ab_imgs ){
+    console.log('ab_imgs[img].clicks: ', ab_imgs[img].clicks);
     Image.where({ ab_imgs_id: img })
-         .save( { clicks: ab_imgs[img].clicks, views: ab_imgs[img].views }, {method: 'update'} );
+         .save( { clicks: ab_imgs[img].clicks, views: ab_imgs[img].views }, {method: 'update'} )
+         .then(function(result) {
+            console.log('updateImgs result: ', result);
+         });
   } 
 };
 
@@ -26,12 +30,13 @@ exports.updateCampaignsClicksAndViews = function( that, ABTestID ) {
           for( var img in ab_imgs ){
             totalViews += ab_imgs[img].views;
             totalClicks += ab_imgs[img].clicks;
-            ab_imgs[img].clicks = 0;
+            // ab_imgs[img].clicks = 0;
           }
+          campaignID = abRow.attributes.campaign_id;
           Campaigns.where( { campaign_id: campaignID } )
                    .fetch()
                    .then(function( campaignRow ){
-                      campaignClicks = campaignRow.attributes.clicks + totalClicks;
+                      // campaignClicks = campaignRow.attributes.clicks + totalClicks;
                       Campaigns.where( { campaign_id: campaignID } )
                                .save( { clicks: campaignClicks, views: totalViews }, {method: 'update'} );
                    })
