@@ -98,7 +98,8 @@ MemCache.prototype.getRedirectUrl = function( ABTestID, email, timeClicked ){
     redir = this[ ABTestID ].winner.redirectURL;
   } else {
     for( var img in imgs ){
-      if( email in imgs[img].emails ) {
+      if( imgs[img].emails[email] ) {
+        console.log('inside if')
         imgs[img].clicks++;
         redir = imgs[img].redirectURL;
       }
