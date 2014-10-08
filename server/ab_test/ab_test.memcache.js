@@ -1,14 +1,22 @@
 // 'use strict';
 
-// var bookshelf = require('../config/bookshelf_config');
+var bookshelf = require('../config/bookshelf_config');
 
-// var Image = bookshelf.Model.extend({
-//   tableName: 'ab_imgs'
-// });
+var Image = bookshelf.Model.extend({
+  tableName: 'ab_imgs'
+});
 
-// var AbTest = bookshelf.Model.extend({
-//   tableName: 'ab_tests'
-// });
+var AbTest = bookshelf.Model.extend({
+  tableName: 'ab_tests'
+});
+
+var AB_Open_Time = bookshelf.Model.extend({
+  tableName: 'ab_open_time'
+});
+
+var AB_Click_Time = bookshelf.Model.extend({
+  tableName: 'ab_click_time'
+});
 
 // Module for creating a MemCache object
 
@@ -44,8 +52,17 @@ MemCache.prototype.selectWinner = function(ABTestID) {
     }
   }
 
-  // Set the winner
-  this[ ABTestID ].winner = this[ ABTestID].imgs[ highestClickImageID ];
+  // Copy the winner object out so that the imgs object can be 'frozen'
+  // this[ ABTestID ].winner = this[ ABTestID].imgs[ highestClickImageID ];
+  var winner = this[ ABTestID].imgs[ highestClickImageID ];
+  var newWinner = {};
+  for( var key in winner ) {
+    newWinner[key] = winner[key];
+  }
+  console.log( 'newWinner: ', newWinner );
+
+  newWinner.imgid = highestClickImageID;
+  this[ ABTestID ].winner = newWinner;
   console.log( 'this is the winner!: ', this[ ABTestID ].winner );
   return highestClickImageID;
 }
@@ -72,14 +89,20 @@ MemCache.prototype.hasABTest = function( ABTestID ) {
 // Gets the Redirect URL for the img viewed by the email and increments the img clicks count
 MemCache.prototype.getRedirectUrl = function( ABTestID, email, timeClicked ){
   console.log('abid', this[ ABTestID ]);
+  var redir;
   imgs = this[ ABTestID ].imgs;
-  for( var img in imgs ){
-    if( email in imgs[img].emails ) {
-      imgs[img].clicks++;
-      this[ ABTestID ].clickTime[ timeClicked ]++;
-      var redir = imgs[img].redirectURL;
+  if( this.winnerExists(ABTestID) ) {
+    this[ ABTestID ].winner.clicks++;
+    redir = this[ ABTestID ].winner.redirectURL;
+  } else {
+    for( var img in imgs ){
+      if( email in imgs[img].emails ) {
+        imgs[img].clicks++;
+        redir = imgs[img].redirectURL;
+      }
     }
   }
+  this[ ABTestID ].clickTime[ timeClicked + '_' + (timeClicked + 1) ]++;
   return redir;
 }
 
@@ -90,14 +113,14 @@ MemCache.prototype.getRandomImg = function( ABTestID, email, timeViewed ){
   var selectedImgKey = imgKeys[ randomIndex ];
   this[ ABTestID ].imgs[ selectedImgKey ].emails[ email ] = email;
   this[ ABTestID ].imgs[ selectedImgKey ].views++;
-  this[ ABTestID ].viewTime[ timeViewed ]++;
+  this[ ABTestID ].viewTime[ timeViewed + '_' + (timeViewed + 1) ]++;
   return this[ ABTestID ].imgs[ selectedImgKey ].fileLocation;
 }
 
 MemCache.prototype.winnerViewed = function( ABTestID, email, timeViewed ) {
  this[ ABTestID ].winner.emails[ email ] = email;
  this[ ABTestID ].winner.views++;
- this[ ABTestID ].viewTime[ timeViewed ]++;
+ this[ ABTestID ].viewTime[ timeViewed + '_' + (timeViewed + 1) ]++;
 }
 
 MemCache.prototype.hasABTest = function( ABTestID ) {
@@ -119,10 +142,10 @@ MemCache.prototype.addABTest = function( ABTestID, endTime ) {
   this[ ABTestID ] = 
     { imgs: { },
       endTime: endTime,
-      viewTime: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0,
-        12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0 },
-      clickTime: { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0,
-        12: 0, 13: 0, 14: 0, 15: 0, 16: 0, 17: 0, 18: 0, 19: 0, 20: 0, 21: 0, 22: 0, 23: 0 },
+      viewTime: { '0_1': 0, '1_2': 0, '2_3': 0, '3_4': 0, '4_5': 0, '5_6': 0, '6_7': 0, '7_8': 0, '8_9': 0, '9_10': 0, '10_11': 0, '11_12': 0,
+        '12_13': 0, '13_14': 0, '14_15': 0, '15_16': 0, '16_17': 0, '17_18': 0, '18_19': 0, '19_20': 0, '20_21': 0, '21_22': 0, '22_23': 0, '23_24': 0 },
+      clickTime: { '0_1': 0, '1_2': 0, '2_3': 0, '3_4': 0, '4_5': 0, '5_6': 0, '6_7': 0, '7_8': 0, '8_9': 0, '9_10': 0, '10_11': 0, '11_12': 0,
+        '12_13': 0, '13_14': 0, '14_15': 0, '15_16': 0, '16_17': 0, '17_18': 0, '18_19': 0, '19_20': 0, '20_21': 0, '21_22': 0, '22_23': 0, '23_24': 0 },
       winner: null
     }
 
@@ -136,11 +159,57 @@ MemCache.prototype.addABTest = function( ABTestID, endTime ) {
         fileLocation: arguments[i][2]
       }
   }
+  var context = this;
+  setInterval( function() { context.syncToDatabase( ABTestID ) }, 10000 );
 };
 
-// MemCache.prototype.syncToDatabase = function(){
+MemCache.prototype.syncToDatabase = function( ABTestID ){
+  //Update sql schema for winner view and clicks
+ 
+  //Override clicks and views for each image
+  //Override views for the campaign
+  //Override clicks for the campaign
 
-// }
+  //Override click time for ab_test_id
+  syncViewTime( ABTestID, this );
+  //Override view time for ab_test_id
+  syncClickTime( ABTestID, this );
+  //Update winner clicks/views if there is a winner
+  if( this.winnerExists(ABTestID) ) {
+    syncWinner( ABTestID, this );
+  }
+
+};
+
+var syncViewTime = function(ABTestID, context) {
+  var ab_test_obj = context[ABTestID].viewTime;
+
+  AB_Open_Time.where({ab_test_id: ABTestID}).save(ab_test_obj,{method: 'update'})
+    .then(function(ab_test){
+      // console.log('result++++', ab_test);
+    });
+}
+
+var syncClickTime = function(ABTestID, context) {
+  var ab_test_obj = context[ABTestID].clickTime;
+
+  AB_Click_Time.where({ab_test_id: ABTestID}).save(ab_test_obj,{method: 'update'})
+    .then(function(ab_test){
+      // console.log('result++++', ab_test);
+    });
+}
+
+var syncWinner = function(ABTestID, context) {
+  var ab_test_obj = context[ ABTestID ].winner;
+  var ab_winner_obj = {};
+  ab_winner_obj.winner_imgid = ab_test_obj.imgid;
+  ab_winner_obj.winner_views = ab_test_obj.views;
+  ab_winner_obj.winner_clicks = ab_test_obj.clicks;
+
+  AbTest.where({ab_test_id: ABTestID}).save(ab_winner_obj,{method: 'update'})
+    .then(function(ab_test) {
+    });
+}
 
 var memCache = new MemCache();
 
