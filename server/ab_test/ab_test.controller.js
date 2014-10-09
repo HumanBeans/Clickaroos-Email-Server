@@ -104,7 +104,8 @@ exports.serveImage = function(req, res) {
   // display image when email is opened
   exports.showImage = function(req, res, imagePath) {
     res.writeHead(200, {
-     'Content-Type' : 'image/png'
+     'Content-Type' : 'image/png',
+     'Cache-Control': 'no-cache'
     });
    fs.createReadStream(imagePath, { 'bufferSize': 4 * 1024 }).pipe(res);
   };
