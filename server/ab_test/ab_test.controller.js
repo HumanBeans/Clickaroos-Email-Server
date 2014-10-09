@@ -6,6 +6,7 @@ var fs = require('fs');
 var q = require('q');
 var bookshelf = require('../config/bookshelf_config.js');
 var abMem = require('./ab_test.memcache.js').memCache;
+var checkDevice = require('../helpers.js').checkDevice;
 
 var Image = bookshelf.Model.extend({
   tableName: 'ab_imgs'
@@ -25,6 +26,7 @@ var AbTest = bookshelf.Model.extend({
 exports.serveImage = function(req, res) {
   var currentHour = new Date().getHours();
   var abTestID = req.params.ab_testID;
+  var device = checkDevice(req, res);
   // console.log('REQ: ', req);
   // console.log('ABTESTID: ', abTestID);
   // var userEmail = req.url.match(/\b[a-zA-Z0-9_.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+\b/g)[0];
@@ -33,33 +35,35 @@ exports.serveImage = function(req, res) {
   console.log('[serveImg] userEmail: ', userEmail);
   var campaignImages, servedImage;
 
+  // abMem[ abTestID ].device[device] += 1;
+
   var serveImgLogic = function() {
     // If there is winner
     if( abMem.winnerExists(abTestID) ) {
       // Show winner
-      var imageLoc = abMem[ abTestID ].winner.fileLocation;
-      console.log('1: image_loc ', imageLoc);
+      abMem[ abTestID ].device[device]++;
       abMem.winnerViewed(abTestID, userEmail, currentHour);
+      var imageLoc = abMem[ abTestID ].winner.fileLocation;
       return exports.showImage(req, res, imageLoc);
     }
     // If there is !winner && endTime has passed 
     else if ( !abMem.winnerExists(abTestID) && abEndTimePassed(abTestID) ) {
     // else if ( !abMem.winnerExists(abTestID) && fake ) {
       // Set a winner
-      console.log('Selecting Winner');
       abMem.selectWinner(abTestID);
 
-      console.log('Winner is: ', abTestID);
+      console.log('Selecting winner... ABTestID >> ', abTestID);
       // Show winner
-      var imageLoc = abMem[ abTestID ].winner.fileLocation;
+      abMem[ abTestID ].device[device]++;
       abMem.winnerViewed(abTestID, userEmail, currentHour);
+      var imageLoc = abMem[ abTestID ].winner.fileLocation;
       return exports.showImage(req, res, imageLoc);
     }
     // If endTime hasn't passed
     else {
       // Show random image
+      abMem[ abTestID ].device[device]++;
       var imageLoc = abMem.getRandomImg(abTestID, userEmail, currentHour);
-      console.log('3: image_loc ', imageLoc);
       return exports.showImage(req, res, imageLoc);
     }
   }
