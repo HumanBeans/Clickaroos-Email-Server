@@ -24,8 +24,8 @@ module.exports = function(app){
 
     // if name === Mac OS X|| Windows || Ubuntu || Mint
       // return Desktop
-    console.log( 'FINAL Device: ', checkDevice(res, res) );
-    
+    console.log( 'FINAL Device: ', checkDevice(req, res) );
+
     console.log( type + model + device );
     res.json( type + model + device );
   });
