@@ -11,10 +11,18 @@ var express = require('express');
 var fs = require('fs');
 var ab = require('./ab_test/ab_test.controller.js');
 var siteRedirect = require('./ab_test/site_redirect/main');
+var useragent = require('useragent');
 
 module.exports = function(app){
   // app.use('/clicks', imageRequestHandlers);
   
+  app.get('/ua', function(req, res) {
+    var ua = useragent.parse(req.headers['user-agent']);
+
+    // res.send('ua: ', ua.os.toString());  
+    res.send('ua: ', ua.toJSON());  
+  });
+
   app.get('/getImg/*', function(req) {
     ab.getImage(req);
   });
