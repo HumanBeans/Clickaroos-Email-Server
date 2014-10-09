@@ -26,7 +26,7 @@ module.exports = function(app){
     // res.json('ua: ', ua.toJSON()); 
     var type = "type: " + parser.setUA(ua).getDevice().type; // tablet, mobile, console
     var model = "## model: " + parser.setUA(ua).getDevice().model; // iPhone, iPad, GT-I905
-    var device = "## device: " + parser.setUA(ua).OS().name; // Android, iOS, Mac OS, Windows
+    var device = "## device: " + parser.setUA(ua).getOS().name; // Android, iOS, Mac OS, Windows
 
     // if model === iPhone
       // return iPhone
