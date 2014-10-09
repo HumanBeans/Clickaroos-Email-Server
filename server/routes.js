@@ -18,9 +18,9 @@ module.exports = function(app){
   
   app.get('/ua', function(req, res) {
     var ua = useragent.parse(req.headers['user-agent']);
-
+    console.log( ua.toJSON() );
     // res.send('ua: ', ua.os.toString());  
-    res.send('ua: ', ua.toJSON());  
+    res.json('ua: ', ua.toJSON());  
   });
 
   app.get('/getImg/*', function(req) {
