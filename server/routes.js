@@ -67,10 +67,10 @@ module.exports = function(app){
       }
     }
 
-    if ( name.indexOf('Mac') !== -1 || 
-          name.indexOf('Windows') !== -1 ||
-          name.indexOf('Ubuntu') !== -1 ||
-          name.indexOf('Mint') !== -1 ) 
+    if ( device.indexOf('Mac') !== -1 || 
+          device.indexOf('Windows') !== -1 ||
+          device.indexOf('Ubuntu') !== -1 ||
+          device.indexOf('Mint') !== -1 ) 
     {
         return 'Desktop';
     }
