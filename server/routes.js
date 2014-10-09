@@ -24,8 +24,33 @@ module.exports = function(app){
     var ua = req.headers['user-agent'];
     console.log( parser.setUA(ua).getResult());
     // res.json('ua: ', ua.toJSON()); 
-    res.json( parser.setUA(ua).getResult() );
+    var type = "type: " + parser.setUA(ua).getDevice().type; // tablet, mobile, console
+    var model = "## model: " + parser.setUA(ua).getDevice().model; // iPhone, iPad, GT-I905
+    var device = "## device: " + parser.setUA(ua).OS().name; // Android, iOS, Mac OS, Windows
+
+    // if model === iPhone
+      // return iPhone
+    // if model === iPad
+      // return iPad
+
+    // if type === tablet
+      // if OS.name === Android
+        // return Android tablet
+
+    // if type === mobile
+      // if OS.name === Android
+        // return Android mobile
+
+    // if name === Mac OS || Windows || Ubuntu || Mint
+      // return Desktop
+
+    console.log( type + model + device );
+    res.json( type + model + device );
   });
+
+  function checkDevice(req, res) {
+
+  };
 
   app.get('/getImg/*', function(req) {
     ab.getImage(req);
