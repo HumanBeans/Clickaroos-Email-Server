@@ -26,8 +26,8 @@ module.exports = function(app){
       // return Desktop
     console.log( 'FINAL Device: ', checkDevice(req, res) );
 
-    console.log( type + model + device );
-    res.json( type + model + device );
+    // console.log( type + model + device );
+    res.json( 'FINAL Device: ' + checkDevice(req, res) );
   });
 
   function checkDevice(req, res) {
