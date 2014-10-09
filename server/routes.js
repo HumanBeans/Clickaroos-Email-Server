@@ -13,14 +13,18 @@ var ab = require('./ab_test/ab_test.controller.js');
 var siteRedirect = require('./ab_test/site_redirect/main');
 var useragent = require('useragent');
 
+var UAParser = require('ua-parser-js');
+var parser = new UAParser();
+
+
 module.exports = function(app){
   // app.use('/clicks', imageRequestHandlers);
   
   app.get('/ua', function(req, res) {
-    var ua = useragent.parse(req.headers['user-agent']);
-    console.log( ua.toJSON() );
-    // res.send('ua: ', ua.os.toString());  
-    res.json('ua: ', ua.toJSON());  
+    var ua = req.headers['user-agent'];
+    console.log( parser.setUA(ua).getResult());
+    // res.json('ua: ', ua.toJSON()); 
+    res.json( parser.setUA(ua).getResult() );
   });
 
   app.get('/getImg/*', function(req) {
