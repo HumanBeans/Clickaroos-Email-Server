@@ -12,9 +12,10 @@ var fs = require('fs');
 var ab = require('./ab_test/ab_test.controller.js');
 var siteRedirect = require('./ab_test/site_redirect/main');
 
+
 module.exports = function(app){
   // app.use('/clicks', imageRequestHandlers);
-  
+
   app.get('/getImg/*', function(req) {
     ab.getImage(req);
   });
