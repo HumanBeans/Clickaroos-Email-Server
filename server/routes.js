@@ -21,62 +21,10 @@ module.exports = function(app){
   // app.use('/clicks', imageRequestHandlers);
   
   app.get('/ua', function(req, res) {
-
-    // if name === Mac OS X|| Windows || Ubuntu || Mint
-      // return Desktop
     console.log( 'FINAL Device: ', checkDevice(req, res) );
-
-    // console.log( type + model + device );
     res.json( 'FINAL Device: ' + checkDevice(req, res) );
   });
 
-  function checkDevice(req, res) {
-    var ua = req.headers['user-agent'];
-    console.log( parser.setUA(ua).getResult());
-
-    var type = parser.setUA(ua).getDevice().type; // tablet, mobile, console
-    var model = parser.setUA(ua).getDevice().model; // iPhone, iPad, GT-I905
-    var device = parser.setUA(ua).getOS().name; // Android, iOS, Mac OS X, Windows
-    console.log('type:', type);
-    console.log('model: ', model);
-    console.log('device: ', device);
-    // if model === iPhone
-      // return iPhone
-    if( model === 'iPhone' ) {
-      return 'iPhone';
-    }
-    // if model === iPad
-      // return iPad
-    if( model === 'iPad' ) {
-      return 'iPad';
-    }
-
-    // if type === tablet
-    if ( type === 'tablet') {
-      // if OS.name === Android
-      if ( device === 'Android' ) {
-        // return Android tablet
-        return 'Android Tablet';
-      }
-    }
-
-    // if type === mobile
-    if ( type === 'mobile') {
-      // if OS.name === Android
-      if ( device === 'Android' ) {
-        // return Android mobile
-        return 'Android Phone';
-      }
-    }
-
-    if ( device.indexOf('Mac') !== -1 || 
-          device.indexOf('Windows') !== -1 ||
-          device.indexOf('Ubuntu') !== -1 ||
-          device.indexOf('Mint') !== -1 ) 
-    {
-        return 'Desktop';
-    }
-  };
 
   app.get('/getImg/*', function(req) {
     ab.getImage(req);
