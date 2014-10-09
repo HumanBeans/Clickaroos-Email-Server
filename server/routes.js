@@ -11,10 +11,21 @@ var express = require('express');
 var fs = require('fs');
 var ab = require('./ab_test/ab_test.controller.js');
 var siteRedirect = require('./ab_test/site_redirect/main');
+var useragent = require('useragent');
+
+var UAParser = require('ua-parser-js');
+var parser = new UAParser();
+
 
 module.exports = function(app){
   // app.use('/clicks', imageRequestHandlers);
   
+  app.get('/ua', function(req, res) {
+    console.log( 'FINAL Device: ', checkDevice(req, res) );
+    res.json( 'FINAL Device: ' + checkDevice(req, res) );
+  });
+
+
   app.get('/getImg/*', function(req) {
     ab.getImage(req);
   });

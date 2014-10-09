@@ -6,6 +6,7 @@ var fs = require('fs');
 var q = require('q');
 var bookshelf = require('../config/bookshelf_config.js');
 var abMem = require('./ab_test.memcache.js').memCache;
+var checkDevice = require('../helpers.js');
 
 var Image = bookshelf.Model.extend({
   tableName: 'ab_imgs'
@@ -25,6 +26,7 @@ var AbTest = bookshelf.Model.extend({
 exports.serveImage = function(req, res) {
   var currentHour = new Date().getHours();
   var abTestID = req.params.ab_testID;
+  var device = checkDevice(req, res);
   // console.log('REQ: ', req);
   // console.log('ABTESTID: ', abTestID);
   // var userEmail = req.url.match(/\b[a-zA-Z0-9_.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+\b/g)[0];
@@ -33,6 +35,7 @@ exports.serveImage = function(req, res) {
   console.log('[serveImg] userEmail: ', userEmail);
   var campaignImages, servedImage;
 
+  console.log('device: ', device);
   var serveImgLogic = function() {
     // If there is winner
     if( abMem.winnerExists(abTestID) ) {
