@@ -34,10 +34,12 @@ module.exports = function(app){
     var ua = req.headers['user-agent'];
     console.log( parser.setUA(ua).getResult());
 
-    var type = "type: " + parser.setUA(ua).getDevice().type; // tablet, mobile, console
-    var model = "## model: " + parser.setUA(ua).getDevice().model; // iPhone, iPad, GT-I905
-    var device = "## device: " + parser.setUA(ua).getOS().name; // Android, iOS, Mac OS X, Windows
-
+    var type = parser.setUA(ua).getDevice().type; // tablet, mobile, console
+    var model = parser.setUA(ua).getDevice().model; // iPhone, iPad, GT-I905
+    var device = parser.setUA(ua).getOS().name; // Android, iOS, Mac OS X, Windows
+    console.log('type:', type);
+    console.log('model: ', model);
+    console.log('device: ', device);
     // if model === iPhone
       // return iPhone
     if( model === 'iPhone' ) {
