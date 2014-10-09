@@ -40,12 +40,12 @@ module.exports = function(app){
 
     // if model === iPhone
       // return iPhone
-    if( device === 'iPhone' ) {
+    if( model === 'iPhone' ) {
       return 'iPhone';
     }
     // if model === iPad
       // return iPad
-    if( device === 'iPad' ) {
+    if( model === 'iPad' ) {
       return 'iPad';
     }
 
