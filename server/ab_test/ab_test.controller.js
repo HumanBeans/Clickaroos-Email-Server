@@ -91,15 +91,15 @@ exports.serveImage = function(req, res) {
   //   });
   // };
 
-  exports.getImage = function(imageUrl, imageName) {
-    // console.log('req: ', req);
-    // var imgUrl = typeof(req) === 'string' ? req : req.url.slice(8);
-    var file = fs.createWriteStream(imageName);
-    http.get(imageUrl, function(response) {
-      response.pipe(file);
-      console.log('get img is done');
-    });
-  };
+  // exports.getImage = function(imageUrl, imageName) {
+  //   // console.log('req: ', req);
+  //   // var imgUrl = typeof(req) === 'string' ? req : req.url.slice(8);
+  //   var file = fs.createWriteStream(imageName);
+  //   http.get(imageUrl, function(response) {
+  //     response.pipe(file);
+  //     console.log('get img is done');
+  //   });
+  // };
 
   // display image when email is opened
   exports.showImage = function(req, res, imagePath) {
@@ -164,15 +164,17 @@ exports.serveImage = function(req, res) {
     })  
     // download images to server
     .then(function() {
-      downloadImages(res, req, imgPathAssetUrl);
+      return downloadImages(res, req, imgPathAssetUrl, imgModelArray.length);
     })
     // call serveImage again now that images have been downloaded to server
-    .then(function() {
-      console.log('outside setTimeout');
-      setTimeout(function() {
-        exports.serveImage(res, req);
-        console.log('inside setTimeout');
-      }, 5000);
+    .then(function(pro) {
+      console.log('return promised ', pro );
+      // console.log('outside setTimeout');
+      // setTimeout(function() {
+      //   exports.serveImage(res, req);
+      //   console.log('inside setTimeout');
+      // }, 5000);
+      exports.serveImage(res, req);
     })
     .catch(function(err) {
       console.log('error: ', err);
@@ -180,10 +182,35 @@ exports.serveImage = function(req, res) {
   };
 
   // download all images from Azure blob and trigger serveImages
-  var downloadImages = function(req, res, imgPathAssetUrl) {
+  var downloadImages = function(req, res, imgPathAssetUrl, num) {
+    var deferred = q.defer();
+    var counter = 0;
+
     console.log('downloading_images');
     for( var imgId in imgPathAssetUrl ) {
       console.log( imgId, imgPathAssetUrl );
-      exports.getImage( imgPathAssetUrl[imgId].asset_url, imgPathAssetUrl[imgId].filePathString );
+      exports.getImage( imgPathAssetUrl[imgId].asset_url, imgPathAssetUrl[imgId].filePathString, function(){
+        counter++;
+        if(counter === num){
+          deferred.resolve('finished');
+        }
+      } );
     }
+
+    return deferred.promise;
   };
+
+  exports.getImage = function(imageUrl, imageName, callback) {
+    // console.log('req: ', req);
+    // var imgUrl = typeof(req) === 'string' ? req : req.url.slice(8);
+    var file = fs.createWriteStream(imageName);
+    http.get(imageUrl, function(response) {
+      response.pipe(file, {end: false});
+      response.on('end', function(){
+        console.log('get img is done');
+        callback();
+      })
+    });
+  };
+
+
