@@ -157,6 +157,14 @@ MemCache.prototype.addABTest = function( ABTestID, endTime ) {
         'Android Tablet': 0,
         'Desktop': 0,
         'Other': 0
+      },
+      device_click: {
+        'iPhone': 0,
+        'iPad': 0,
+        'Android Phone': 0,
+        'Android Tablet': 0,
+        'Desktop': 0,
+        'Other': 0
       }
     }
 

@@ -9,6 +9,9 @@ var Campaigns = bookshelf.Model.extend({
 var AbTest = bookshelf.Model.extend({
   tableName: 'ab_tests'
 });
+var AB_Click_Device = bookshelf.Model.extend({
+  tableName: 'ab_click_device'
+});
 
 exports.updateImgsClicksAndViews = function( that, ABTestID ) {
   var ab_imgs = that[ ABTestID ].imgs;
@@ -38,22 +41,35 @@ exports.updateCampaignsClicksAndViews = function( that, ABTestID ) {
                    .fetch()
                    .then(function( campaignRow ){
                       // campaignClicks = campaignRow.attributes.clicks + totalClicks;
-                      campaign_data.iphone = that[ABTestID].device['iPhone'];
-                      campaign_data.ipad = that[ABTestID].device['iPad'];
-                      campaign_data.android_phone = that[ABTestID].device['Android Phone'];
-                      campaign_data.android_pad = that[ABTestID].device['Android Tablet'];
-                      campaign_data.desktop = that[ABTestID].device['Desktop'];
-                      campaign_data.device_other = that[ABTestID].device['Other'];
+                      campaign_data.iphone = that[ABTestID].device_open['iPhone'];
+                      campaign_data.ipad = that[ABTestID].device_open['iPad'];
+                      campaign_data.android_phone = that[ABTestID].device_open['Android Phone'];
+                      campaign_data.android_pad = that[ABTestID].device_open['Android Tablet'];
+                      campaign_data.desktop = that[ABTestID].device_open['Desktop'];
+                      campaign_data.device_other = that[ABTestID].device_open['Other'];
 
 
                       campaign_data.clicks = totalClicks;
                       campaign_data.views = totalViews;
 
-                      console.log('campaign_data========', campaign_data);
+                      console.log('campaign_data======== ', campaign_data);
 
                       Campaigns.where( { campaign_id: campaignID } )
                                .save( campaign_data, {method: 'update'} );
                    })
-        }) 
+        })
+        .then(function(){
+          var abClickDeviceObj = {};
+          abClickDeviceObj.iphone = that[ABTestID].device_click['iPhone'];
+          abClickDeviceObj.ipad = that[ABTestID].device_click['iPad'];
+          abClickDeviceObj.android_phone = that[ABTestID].device_click['Android Phone'];
+          abClickDeviceObj.android_pad = that[ABTestID].device_click['Android Tablet'];
+          abClickDeviceObj.desktop = that[ABTestID].device_click['Desktop'];
+          abClickDeviceObj.device_other = that[ABTestID].device_click['Other'];
+
+          console.log('ab_click_device data========, ', abClickDeviceObj);
+
+          AB_Click_Device.where({ ab_test_id: ABTestID }).save(abClickDeviceObj, {method: 'update'});
+        }); 
 };
 
