@@ -6,14 +6,20 @@ var memCache = require('../ab_test.memcache').memCache;
 
 var bookshelf = require('../../config/bookshelf_config');
 var ABImg = bookshelf.Model.extend({ tableName: 'ab_imgs' });
+var checkDevice = require('../../helpers.js').checkDevice;
 
 exports.serveSite = function(req, res) {
   var currentHour = new Date().getHours();
   var abTestID = req.params.abTestID;
   console.log('abTestID ', abTestID);
   // var userEmail = req.url.match(/\b[a-zA-Z0-9_.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+\b/g)[0];
+
   var userEmail = req.originalUrl.split('/').pop();
   console.log('useremail: ', userEmail);
+
+  //collect the device_click data
+  var device = checkDevice(req, res);
+  memCache[ abTestID ].device_click[device]++;
 
   var redirectUrl = memCache.getRedirectUrl(abTestID, userEmail, currentHour);
 

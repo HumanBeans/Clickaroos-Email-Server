@@ -41,7 +41,7 @@ exports.serveImage = function(req, res) {
     // If there is winner
     if( abMem.winnerExists(abTestID) ) {
       // Show winner
-      abMem[ abTestID ].device[device]++;
+      abMem[ abTestID ].device_open[device]++;
       abMem.winnerViewed(abTestID, userEmail, currentHour);
       var imageLoc = abMem[ abTestID ].winner.fileLocation;
       return exports.showImage(req, res, imageLoc);
@@ -54,7 +54,7 @@ exports.serveImage = function(req, res) {
 
       console.log('Selecting winner... ABTestID >> ', abTestID);
       // Show winner
-      abMem[ abTestID ].device[device]++;
+      abMem[ abTestID ].device_open[device]++;
       abMem.winnerViewed(abTestID, userEmail, currentHour);
       var imageLoc = abMem[ abTestID ].winner.fileLocation;
       return exports.showImage(req, res, imageLoc);
@@ -62,7 +62,7 @@ exports.serveImage = function(req, res) {
     // If endTime hasn't passed
     else {
       // Show random image
-      abMem[ abTestID ].device[device]++;
+      abMem[ abTestID ].device_open[device]++;
       var imageLoc = abMem.getRandomImg(abTestID, userEmail, currentHour);
       return exports.showImage(req, res, imageLoc);
     }
