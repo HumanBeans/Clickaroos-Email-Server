@@ -23,6 +23,8 @@ exports.serveSite = function(req, res) {
   // using supplied offset
   var currentHour = new Date(currentHour_UTC + (3600000*offset)).getHours();
 
+  console.log('in click currentHour: ', currentHour);
+
   var abTestID = req.params.abTestID;
   console.log('abTestID ', abTestID);
   // var userEmail = req.url.match(/\b[a-zA-Z0-9_.-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9.-]+\b/g)[0];
