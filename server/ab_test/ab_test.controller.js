@@ -24,7 +24,21 @@ var AbTest = bookshelf.Model.extend({
 
 // *** EMAIL SERVER FUNCTIONS ***
 exports.serveImage = function(req, res) {
-  var currentHour = new Date().getHours();
+  // var currentHour = new Date().getHours();
+
+  var currentDate_UTC = new Date();
+  // convert to msec
+  // add local time zone offset
+  // get UTC time in msec
+  var offset = -7;
+  console.log('timezone offset: ', currentDate_UTC.getTimezoneOffset());
+  var currentHour_UTC = currentDate_UTC.getTime() + (currentDate_UTC.getTimezoneOffset() * 60000);
+
+  // create new Date object for different city
+  // using supplied offset
+  var currentHour = new Date(currentHour_UTC + (3600000*offset)).getHours();
+  console.log('currentHour: ', currentHour);
+  
   var abTestID = req.params.ab_testID;
   var device = checkDevice(req, res);
   // console.log('REQ: ', req);
