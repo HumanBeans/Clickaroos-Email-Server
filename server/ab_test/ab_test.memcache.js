@@ -25,9 +25,7 @@ var MemCache = function() {
 };
 
 MemCache.prototype.winnerExists = function(ABTestID) {
-  if(this[ ABTestID ].winner) {
-    return true;
-  }
+  if(this[ ABTestID ].winner) return true;
   return false;
 }
 
@@ -58,11 +56,11 @@ MemCache.prototype.selectWinner = function(ABTestID) {
   for( var key in winner ) {
     newWinner[key] = winner[key];
   }
-  console.log( 'newWinner: ', newWinner );
+  // console.log( 'newWinner: ', newWinner );
 
   newWinner.imgid = highestClickImageID;
   this[ ABTestID ].winner = newWinner;
-  console.log( 'this is the winner!: ', this[ ABTestID ].winner );
+  // console.log( 'this is the winner!: ', this[ ABTestID ].winner );
   return highestClickImageID;
 }
 
@@ -91,7 +89,8 @@ MemCache.prototype.getRedirectUrl = function( ABTestID, email, timeClicked ){
   if( this.winnerExists(ABTestID) ) {
     this[ ABTestID ].winner.clicks++;
     redir = this[ ABTestID ].winner.redirectURL;
-  } else {
+  } 
+  else {
     for( var img in imgs ){
       if( email in imgs[img].emails ) {
         imgs[img].clicks++;
@@ -180,7 +179,7 @@ MemCache.prototype.syncToDatabase = function( ABTestID ){
 var syncViewTime = function(ABTestID, context) {
   var ab_test_obj = context[ABTestID].viewTime;
 
-  AB_Open_Time.where({ab_test_id: ABTestID}).save(ab_test_obj,{method: 'update'})
+  AB_Open_Time.where({ab_test_id: ABTestID}).save(ab_test_obj, {method: 'update'})
     .then(function(ab_test){
     });
 }
@@ -188,7 +187,7 @@ var syncViewTime = function(ABTestID, context) {
 var syncClickTime = function(ABTestID, context) {
   var ab_test_obj = context[ABTestID].clickTime;
 
-  AB_Click_Time.where({ab_test_id: ABTestID}).save(ab_test_obj,{method: 'update'})
+  AB_Click_Time.where({ab_test_id: ABTestID}).save(ab_test_obj, {method: 'update'})
     .then(function(ab_test){
     });
 }
@@ -200,7 +199,7 @@ var syncWinner = function(ABTestID, context) {
   ab_winner_obj.winner_views = ab_test_obj.views;
   ab_winner_obj.winner_clicks = ab_test_obj.clicks;
 
-  AbTest.where({ab_test_id: ABTestID}).save(ab_winner_obj,{method: 'update'})
+  AbTest.where({ab_test_id: ABTestID}).save(ab_winner_obj, {method: 'update'})
     .then(function(ab_test) {
     });
 }
