@@ -21,10 +21,8 @@ var AB_Click_Time = bookshelf.Model.extend({
 });
 
 // Module for creating a MemCache object
-
 var MemCache = function() { 
 };
-
 
 MemCache.prototype.winnerExists = function(ABTestID) {
   if(this[ ABTestID ].winner) {
@@ -32,7 +30,6 @@ MemCache.prototype.winnerExists = function(ABTestID) {
   }
   return false;
 }
-
 
 MemCache.prototype.selectWinner = function(ABTestID) {
   var highestClickImageID;
@@ -69,7 +66,6 @@ MemCache.prototype.selectWinner = function(ABTestID) {
   return highestClickImageID;
 }
 
-
 MemCache.prototype.ABTestImgDBInfo = function( ABTestID ) {
   var results = {}, ab_imgs = this[ ABTestID ].imgs, totalViews = 0, totalClicks = 0;
   for( var img in imgs ){
@@ -86,7 +82,6 @@ MemCache.prototype.ABTestImgDBInfo = function( ABTestID ) {
 MemCache.prototype.hasABTest = function( ABTestID ) {
   return (ABTestID in this);
 }
-
 
 // Gets the Redirect URL for the img viewed by the email and increments the img clicks count
 MemCache.prototype.getRedirectUrl = function( ABTestID, email, timeClicked ){
@@ -129,7 +124,6 @@ MemCache.prototype.hasABTest = function( ABTestID ) {
   return (ABTestID in this)
 }
 
-
 ///////////////////////////////////////////////////////////////////////
 //  .addABTest() adds a new ABTest to a memCache object
 //
@@ -166,7 +160,6 @@ MemCache.prototype.addABTest = function( ABTestID, endTime ) {
 };
 
 MemCache.prototype.syncToDatabase = function( ABTestID ){
-  console.log( 'syncToDatabase' );
  
   //Override clicks and views for each image
   updateImgsClicksAndViews( this, ABTestID );
@@ -182,7 +175,6 @@ MemCache.prototype.syncToDatabase = function( ABTestID ){
   if( this.winnerExists(ABTestID) ) {
     syncWinner( ABTestID, this );
   }
-
 };
 
 var syncViewTime = function(ABTestID, context) {
@@ -190,7 +182,6 @@ var syncViewTime = function(ABTestID, context) {
 
   AB_Open_Time.where({ab_test_id: ABTestID}).save(ab_test_obj,{method: 'update'})
     .then(function(ab_test){
-      // console.log('result++++', ab_test);
     });
 }
 
@@ -199,7 +190,6 @@ var syncClickTime = function(ABTestID, context) {
 
   AB_Click_Time.where({ab_test_id: ABTestID}).save(ab_test_obj,{method: 'update'})
     .then(function(ab_test){
-      // console.log('result++++', ab_test);
     });
 }
 
@@ -215,11 +205,6 @@ var syncWinner = function(ABTestID, context) {
     });
 }
 
-
 var memCache = new MemCache();
 
 exports.memCache = memCache;
-
-// memCache.addABTest( 3, 500000, [6, 'www.google.com', './somePicture.png'], [7, 'www.facebook.com', './somePicture7.png'] );
-// console.log( memCache.getRandomImg( 3, 'armandopmj@gmail.com' ) );
-// console.log( memCache.getRedirectUrl( 3, 'armandopmj@gmail.com' ) )
