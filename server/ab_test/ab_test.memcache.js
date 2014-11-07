@@ -21,18 +21,13 @@ var AB_Click_Time = bookshelf.Model.extend({
 });
 
 // Module for creating a MemCache object
-
 var MemCache = function() { 
 };
 
-
 MemCache.prototype.winnerExists = function(ABTestID) {
-  if(this[ ABTestID ].winner) {
-    return true;
-  }
+  if(this[ ABTestID ].winner) return true;
   return false;
 }
-
 
 MemCache.prototype.selectWinner = function(ABTestID) {
   var highestClickImageID;
@@ -61,14 +56,13 @@ MemCache.prototype.selectWinner = function(ABTestID) {
   for( var key in winner ) {
     newWinner[key] = winner[key];
   }
-  console.log( 'newWinner: ', newWinner );
+  // console.log( 'newWinner: ', newWinner );
 
   newWinner.imgid = highestClickImageID;
   this[ ABTestID ].winner = newWinner;
-  console.log( 'this is the winner!: ', this[ ABTestID ].winner );
+  // console.log( 'this is the winner!: ', this[ ABTestID ].winner );
   return highestClickImageID;
 }
-
 
 MemCache.prototype.ABTestImgDBInfo = function( ABTestID ) {
   var results = {}, ab_imgs = this[ ABTestID ].imgs, totalViews = 0, totalClicks = 0;
@@ -87,7 +81,6 @@ MemCache.prototype.hasABTest = function( ABTestID ) {
   return (ABTestID in this);
 }
 
-
 // Gets the Redirect URL for the img viewed by the email and increments the img clicks count
 MemCache.prototype.getRedirectUrl = function( ABTestID, email, timeClicked ){
   console.log('abid', this[ ABTestID ]);
@@ -96,7 +89,8 @@ MemCache.prototype.getRedirectUrl = function( ABTestID, email, timeClicked ){
   if( this.winnerExists(ABTestID) ) {
     this[ ABTestID ].winner.clicks++;
     redir = this[ ABTestID ].winner.redirectURL;
-  } else {
+  } 
+  else {
     for( var img in imgs ){
       if( imgs[img].emails[email] ) {
         console.log('inside if')
@@ -129,7 +123,6 @@ MemCache.prototype.winnerViewed = function( ABTestID, email, timeViewed ) {
 MemCache.prototype.hasABTest = function( ABTestID ) {
   return (ABTestID in this)
 }
-
 
 ///////////////////////////////////////////////////////////////////////
 //  .addABTest() adds a new ABTest to a memCache object
@@ -183,7 +176,6 @@ MemCache.prototype.addABTest = function( ABTestID, endTime ) {
 };
 
 MemCache.prototype.syncToDatabase = function( ABTestID ){
-  console.log( 'syncToDatabase' );
  
   //Override clicks and views for each image
   updateImgsClicksAndViews( this, ABTestID );
@@ -199,24 +191,21 @@ MemCache.prototype.syncToDatabase = function( ABTestID ){
   if( this.winnerExists(ABTestID) ) {
     syncWinner( ABTestID, this );
   }
-
 };
 
 var syncViewTime = function(ABTestID, context) {
   var ab_test_obj = context[ABTestID].viewTime;
 
-  AB_Open_Time.where({ab_test_id: ABTestID}).save(ab_test_obj,{method: 'update'})
+  AB_Open_Time.where({ab_test_id: ABTestID}).save(ab_test_obj, {method: 'update'})
     .then(function(ab_test){
-      // console.log('result++++', ab_test);
     });
 }
 
 var syncClickTime = function(ABTestID, context) {
   var ab_test_obj = context[ABTestID].clickTime;
 
-  AB_Click_Time.where({ab_test_id: ABTestID}).save(ab_test_obj,{method: 'update'})
+  AB_Click_Time.where({ab_test_id: ABTestID}).save(ab_test_obj, {method: 'update'})
     .then(function(ab_test){
-      // console.log('result++++', ab_test);
     });
 }
 
@@ -227,16 +216,11 @@ var syncWinner = function(ABTestID, context) {
   ab_winner_obj.winner_views = ab_test_obj.views;
   ab_winner_obj.winner_clicks = ab_test_obj.clicks;
 
-  AbTest.where({ab_test_id: ABTestID}).save(ab_winner_obj,{method: 'update'})
+  AbTest.where({ab_test_id: ABTestID}).save(ab_winner_obj, {method: 'update'})
     .then(function(ab_test) {
     });
 }
 
-
 var memCache = new MemCache();
 
 exports.memCache = memCache;
-
-// memCache.addABTest( 3, 500000, [6, 'www.google.com', './somePicture.png'], [7, 'www.facebook.com', './somePicture7.png'] );
-// console.log( memCache.getRandomImg( 3, 'armandopmj@gmail.com' ) );
-// console.log( memCache.getRedirectUrl( 3, 'armandopmj@gmail.com' ) )
